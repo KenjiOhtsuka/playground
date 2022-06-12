@@ -97,7 +97,6 @@
                   isPlaying = 1
                   const handDom = document.getElementById('hand')
                   handDom.className = ''
-                  console.log(0)
                   setTimeout(this.show, 1200)
                   setTimeout(function() { isPlaying = 0 }, 2100);
                   audio.play()
@@ -107,7 +106,6 @@
                   let i = Math.random() * 3
                   i = Math.floor(i)
                   handDom.classList.add('hand-' + i.toString())
-                  console.log(handDom.classList)
                 }
             }
         }).mount('#container')
