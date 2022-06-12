@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="vue.global.prod.js"></script>
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="portrait.css">
+    <title>Document</title>
+    <style>
+         @viewport { orientation: portrait; }  
+        html {
+            background: #f8f8f8;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        body {
+            margin: 0;
+            font-size: 2rem;
+            display: flex;
+            /*flex: 1;*/
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        .clock {
+            width: min(50vw, 50vh);
+            height: min(50vw, 50vh);
+            border: 0.25rem solid brown;
+            box-shadow: -4px -4px 10px rgba(144, 144, 144, 0.5),
+            inset 4px 4px 10px rgba(144, 144, 144, 0.5),
+            inset -4px -4px 10px rgba(144, 144, 144, 0.5),
+            4px 4px 10px rgba(144, 144, 144, 0.5);
+            border-radius: 50%;
+            margin: 50px auto;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .outer-clock-face {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background: #f8f8f8;
+            overflow: hidden;
+        }
+
+        .outer-clock-face::after {
+            -webkit-transform: rotate(90deg);
+            -moz-transform: rotate(90deg);
+            transform: rotate(90deg)
+        }
+
+        .outer-clock-face::before,
+        .outer-clock-face::after,
+        .outer-clock-face .marking{
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            background: #000000;
+            z-index: 0;
+            left: 49%;
+        }
+
+        .outer-clock-face .marking {
+            background: #000000;
+            width: 3px;
+        }
+
+        .outer-clock-face .marking.marking-one {
+            -webkit-transform: rotate(30deg);
+            -moz-transform: rotate(30deg);
+            transform: rotate(30deg)
+        }
+
+        .outer-clock-face .marking.marking-two {
+            -webkit-transform: rotate(60deg);
+            -moz-transform: rotate(60deg);
+            transform: rotate(60deg)
+        }
+
+        .outer-clock-face .marking.marking-three {
+            -webkit-transform: rotate(120deg);
+            -moz-transform: rotate(120deg);
+            transform: rotate(120deg)
+        }
+
+        .outer-clock-face .marking.marking-four {
+            -webkit-transform: rotate(150deg);
+            -moz-transform: rotate(150deg);
+            transform: rotate(150deg)
+        }
+
+        .inner-clock-face {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            background: #f8f8f8;
+            -webkit-border-radius: 100%;
+            -moz-border-radius: 100%;
+            border-radius: 100%;
+            z-index: 1;
+        }
+
+        .inner-clock-face::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            border-radius: 18px;
+            margin-left: -9px;
+            margin-top: -6px;
+            background: #bdbdcb;
+            z-index: 11;
+        }
+
+        .hand {
+            width: 50%;
+            right: 50%;
+            height: 6px;
+            background: #61afff;
+            position: absolute;
+            top: 50%;
+            border-radius: 6px;
+            transform-origin: 100%;
+            transform: rotate(90deg);
+            transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+        }
+
+        .hand.hour-hand {
+            width: 30%;
+            z-index: 3;
+        }
+
+        .hand.min-hand {
+            height: 3px;
+            z-index: 10;
+            width: 40%;
+        }
+
+        .hand.second-hand {
+            background: #ee791a;
+            width: 45%;
+            height: 2px;
+        }
+
+        .digital {
+            font-size: min(6rem, 10vw);
+            margin-bottom: 4rem;
+        }
+
+        .speech-button {
+            padding: 0.5em;
+            font-size: min(5rem, 10vw);
+            border-radius: 0.5em;
+            border: none;
+            background-color: #d7f4ff;
+        }
+
+        .speech-button:active {
+            background-color: #ffe7d7;
+        }
+    </style>
+</head>
+<body id="container">
+    <div class="clock">
+        <div class="outer-clock-face">
+            <div class="marking marking-one"></div>
+            <div class="marking marking-two"></div>
+            <div class="marking marking-three"></div>
+            <div class="marking marking-four"></div>
+            <div class="inner-clock-face">
+                <div class="hand hour-hand" :style="{transform: 'rotate(' + hourDegree.toString() + 'deg)'}" ></div>
+                <div class="hand min-hand" :style="{transform: `rotate(${minuteDegree}deg)`}"></div>
+                <div class="hand second-hand" :style="{transform: `rotate(${secondDegree}deg)`}"></div>
+            </div>
+        </div>
+    </div>
+    <div class="indicator">
+        <div class="digital">
+            {{ hourDigits }} : {{ minuteDigits }} : {{ secondDigits }}
+        </div>
+        <button @click="speak()" class="speech-button">いまなんじ？</button>
+    </div>
+    <script>
+        try {
+            screen.lockOrientation('portrait');
+        } catch (e) {
+            // pass
+        }
+        Vue.createApp({
+            data() {
+                return {
+                    date: null,
+                    hour: null,
+                    minute: null,
+                    second: null,
+                    hourDegree: null,
+                    minuteDegree: null,
+                    secondDegree: null,
+                    hourDigits: null,
+                    minuteDigits: null,
+                    secondDigits: null,
+                }
+            },
+            created() {
+                this.setDate();
+                setInterval(this.setDate, 1000);
+            },
+            methods: {
+                speak() {
+                    const text = `${this.hour}時 ${this.minute}分`
+                    const uttr = new SpeechSynthesisUtterance(text)
+                    uttr.lang = 'ja-JP'
+                    uttr.rate = 0.5
+                    speechSynthesis.speak(uttr)
+                },
+                setDate() {
+                    this.date = new Date();
+                    this.hour = this.date.getHours()
+                    this.minute = this.date.getMinutes()
+                    this.second = this.date.getSeconds()
+                    // degree
+                    this.hourDegree = ((this.hour / 12) * 360) + ((this.minute /60) * 30) + 90
+                    this.minuteDegree = ((this.minute / 60) * 360) + ((this.second/60) * 6) + 90
+                    this.secondDegree = ((this.second / 60) * 360) + 90
+                    // digits
+                    this.hourDigits = ('0' + this.hour.toString()).substr(-2, 2)
+                    this.minuteDigits = ('0' + this.minute.toString()).substr(-2, 2)
+                    this.secondDigits = ('0' + this.second.toString()).substr(-2, 2)
+                }
+            }
+        }).mount('#container')
+    </script>
+</body>
+</html>

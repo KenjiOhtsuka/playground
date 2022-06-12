@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="vue.global.prod.js"></script>
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="portrait.css">
+    <title>Document</title>
+    <style>
+         @viewport { orientation: portrait; }  
+        html {
+            background: #f8f8f8;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        body {
+            margin: 0;
+            font-size: 2rem;
+            display: flex;
+            /*flex: 1;*/
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        #hand {
+            width: min(50vh, 50vw);
+            height: min(50vh, 50vw);
+            margin: 1em;
+        }
+
+        .hand-0 {
+          /* 2545-3337, 0-795 */
+          background-image: url('icons.jpg');
+          background-repeat: no-repeat;
+          background-size: calc(3337 / 796 * min(50vh, 50vw));
+          background-position: 100% 0%;
+          /*background-position: calc(-2545 / 3337 * 100%) 0;*/
+        }
+
+        .hand-1 {
+          /* 820-1616 */
+          background-image: url('icons.jpg');
+          background-repeat: no-repeat;
+          background-size: calc(3337 / 796 * min(50vh, 50vw));
+          background-position: 100%;
+        }
+
+        .hand-2 {
+          /* 1641-2635 */
+          background-image: url('icons.jpg');
+          background-repeat: no-repeat;
+          background-size: calc(3337 / 796 * min(50vh, 50vw));
+          background-position: 100% 100%;
+        }
+
+        .play-button {
+            padding: 0.5em;
+            font-size: min(5rem, 10vw);
+            border-radius: 0.5em;
+            border: none;
+            background-color: #d7f4ff;
+        }
+
+        .play-button:active {
+            background-color: #ffe7d7;
+        }
+    </style>
+</head>
+<body id="container">
+    <div id="hand">
+    </div>
+    <div class="indicator">
+        <button @click="play()" id="play_button" class="play-button">あそぶ</button>
+    </div>
+    <script>
+        try {
+            screen.lockOrientation('portrait');
+        } catch (e) {
+            // pass
+        }
+        const audio = new Audio('play_sound.mp3')
+        let isPlaying = 0
+        Vue.createApp({
+            data() {
+                return { }
+            },
+            created() {
+            },
+            methods: {
+                play() {
+                  if (isPlaying == 1) return
+                  isPlaying = 1
+                  const handDom = document.getElementById('hand')
+                  handDom.className = ''
+                  console.log(0)
+                  setTimeout(this.show, 1200)
+                  setTimeout(function() { isPlaying = 0 }, 2100);
+                  audio.play()
+                },
+                show() {
+                  const handDom = document.getElementById('hand')
+                  let i = Math.random() * 3
+                  i = Math.floor(i)
+                  handDom.classList.add('hand-' + i.toString())
+                  console.log(handDom.classList)
+                }
+            }
+        }).mount('#container')
+    </script>
+</body>
+</html>
