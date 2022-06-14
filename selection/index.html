@@ -85,33 +85,8 @@
                 }
             },
             mounted() {
-              speechSynthesis.onvoiceschanged = (e) => {
-                const text = `一番小さい丸を えらんでください`
-                console.log(1)
-                const uttr = new SpeechSynthesisUtterance(text)
               const voices = window.speechSynthesis.getVoices()
-                uttr.lang = 'ja-JP'
-                uttr.rate = 1 
-                //uttr.volume = 100
-                //uttr.pitch = 1
-                console.log(speechSynthesis)
-                speechSynthesis.speak(uttr)
-              }
 
-              setTimeout(() => {
-                let t = "一番小さい丸を えらんでください"
-                console.log(1)
-                const uttr = new SpeechSynthesisUtterance(t)
-                const voices = window.speechSynthesis.getVoices()
-                uttr.lang = 'ja-JP'
-                uttr.rate = 1 
-                //uttr.volume = 100
-                //uttr.pitch = 1
-                console.log(speechSynthesis)
-                speechSynthesis.speak(uttr)
-              }, 3000)
-              this.speak(`一番小さい丸を えらんでください`, 1.0)
-              console.log('mounted')
               this.setup()
             },
             methods: {
@@ -123,7 +98,6 @@
                   return color
                 },
                 hit(i) {
-                  console.log(i)
                   if (i == 1) {
                     this.isSuccess = true
                     hitSound.play()
@@ -174,6 +148,7 @@
                         hit(i)
                       }
                   }
+                  this.speak(`一番小さい丸を えらんでください`, 1.0)
                 },
                 speak(text, rate) {
                     const uttr = new SpeechSynthesisUtterance(text)
