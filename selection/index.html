@@ -71,9 +71,6 @@
         } catch (e) {
             // pass
         }
-        const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-        const length = Math.min(width, height) / 20
         const hitSound = new Audio('sound/Quiz-Correct_Answer01-4.mp3')
         const successCircle = document.getElementById('success')
         Vue.createApp({
@@ -104,6 +101,9 @@
                   }
                 },
                 setup() {
+                  const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                  const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                  const length = Math.min(width, height) / 20
                   this.reservedAreas = []
                   this.isSuccess = false
                   for (let i = this.circles.length - 1; i >= 0; i--) {
