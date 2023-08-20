@@ -8,11 +8,15 @@
     <!--    <script src="vue.global.prod.js"></script>-->
     <script src="matter.min.js"></script>
     <style>
+        html {
+            height: 100%;
+        }
         body {
-            min-height: 100vh;
+            min-height: 100%;
             margin: 0;
         }
     </style>
+    <title>Balance</title>
 </head>
 <body>
     <script>
@@ -22,6 +26,7 @@
         const cylinderHeight = field.clientHeight * 0.15;
         const barThickness = 10;
         const plateWidth = balanceBarWidth * 0.25;
+        const friction = 1;
 
         // module aliases
         var Engine = Matter.Engine,
@@ -62,32 +67,32 @@
 
 
         // create two boxes and a ground
-        const boxA = Bodies.rectangle(200, 200, 80, 80);
-        const boxB = Bodies.rectangle(450, 50, 80, 80);
-        const boxC = Bodies.rectangle(350, 50, 80, 80);
+        const boxA = Bodies.rectangle(200, 200, 80, 80, {friction: friction});
+        const boxB = Bodies.rectangle(450, 50, 80, 80, {friction: friction});
+        const boxC = Bodies.rectangle(350, 50, 80, 80, {friction: friction});
 
         const ground = Bodies.rectangle(
             field.clientWidth / 2.0,
             field.clientHeight - barThickness,
             field.clientWidth, barThickness,
-            {isStatic: true});
+            {isStatic: true, friction: friction});
         const leftWall = Bodies.rectangle(
             barThickness / 2,
             field.clientHeight / 2.0,
             barThickness, field.clientHeight,
-            {isStatic: true}
+            {isStatic: true, friction: friction}
         )
         const rightWall = Bodies.rectangle(
             field.clientWidth - barThickness / 2,
             field.clientHeight / 2.0,
             barThickness, field.clientHeight,
-            {isStatic: true}
+            {isStatic: true, friction: friction}
         )
         const ceiling = Bodies.rectangle(
             field.clientWidth / 2.0,
             barThickness / 2,
             field.clientWidth, barThickness,
-            {isStatic: true}
+            {isStatic: true, friction: friction}
         )
 
         // build balance
@@ -95,7 +100,7 @@
             field.clientWidth / 2.0,
             field.clientHeight * 0.8,
             balanceBarWidth, barThickness,
-            {isStatic: false}
+            {isStatic: false, friction: friction}
         )
         const composedUpperBar = Constraint.create({
             pointA: {x: field.clientWidth / 2.0, y: field.clientHeight * 0.8},
@@ -119,25 +124,25 @@
             field.clientWidth - balanceBarWidth + barThickness / 2,
             field.clientHeight * 0.8,
             barThickness, cylinderHeight,
-            {isStatic: false}
+            {isStatic: false, friction: friction}
         )
         const rightCylinder = Bodies.rectangle(
             field.clientWidth / 2 + balanceBarWidth / 2 - barThickness / 2,
             field.clientHeight * 0.8,
             barThickness, cylinderHeight,
-            {isStatic: false}
+            {isStatic: false, friction: friction}
         )
         const leftPlate = Bodies.rectangle(
             field.clientWidth - balanceBarWidth + barThickness / 2,
             field.clientHeight * 0.8 - cylinderHeight / 2,
             plateWidth, barThickness,
-            {isStatic: false}
+            {isStatic: false, friction: friction}
         )
         const rightPlate = Bodies.rectangle(
-            field.clientWidth / 2 + balanceBarWidth / 2,
+            field.clientWidth / 2 + balanceBarWidth / 2 - barThickness / 2,
             field.clientHeight * 0.8 - cylinderHeight / 2,
             plateWidth, barThickness,
-            {isStatic: false}
+            {isStatic: false, friction: friction}
         )
         const composedLeftPlate = Body.create({
             parts: [leftPlate, leftCylinder],
@@ -161,7 +166,7 @@
             bodyB: upperBalanceBar,
             pointB: {x: - balanceBarWidth / 2, y:0},
             bodyA: composedLeftPlate,
-            pointA: {x: barThickness / 2, y: - field.clientHeight * 0},
+            pointA: {x: barThickness / 2, y: 0},
             stiffness: 1,
             length: 0
         })
@@ -177,7 +182,7 @@
             bodyB: upperBalanceBar,
             pointB: {x: balanceBarWidth / 2, y: 0},
             bodyA: composedRightPlate,
-            pointA: {x: - barThickness / 2, y: - field.clientHeight * 0.0},
+            pointA: {x: - barThickness / 2, y: 0.0},
             stiffness: 1,
             length: 0
         })
