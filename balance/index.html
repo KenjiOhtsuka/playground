@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--    <script src="vue.global.prod.js"></script>-->
+    <script src="matter.min.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const field = document.body
+
+        const balanceBarWidth = field.clientWidth / 1.4
+        const cylinderHeight = field.clientHeight * 0.15;
+        const barThickness = 10;
+        const plateWidth = balanceBarWidth * 0.25;
+
+        // module aliases
+        var Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Body = Matter.Body,
+            Composite = Matter.Composite,
+            Constraint = Matter.Constraint,
+            MouseConstraint = Matter.MouseConstraint,
+            Mouse = Matter.Mouse;
+
+        // create an engine
+        var engine = Engine.create();
+
+        // create a renderer
+        var render = Render.create({
+            element: field,
+            engine: engine,
+            options: {
+                width: field.clientWidth,
+                height: field.clientHeight,
+            }
+        });
+
+        const mouse = Mouse.create(field);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                render: {
+                    visible: false
+                }
+            }
+        })
+
+        Composite.add(engine.world, mouseConstraint)
+        render.mouse = mouse
+
+
+        // create two boxes and a ground
+        const boxA = Bodies.rectangle(200, 200, 80, 80);
+        const boxB = Bodies.rectangle(450, 50, 80, 80);
+        const boxC = Bodies.rectangle(350, 50, 80, 80);
+
+        const ground = Bodies.rectangle(
+            field.clientWidth / 2.0,
+            field.clientHeight - barThickness,
+            field.clientWidth, barThickness,
+            {isStatic: true});
+        const leftWall = Bodies.rectangle(
+            barThickness / 2,
+            field.clientHeight / 2.0,
+            barThickness, field.clientHeight,
+            {isStatic: true}
+        )
+        const rightWall = Bodies.rectangle(
+            field.clientWidth - barThickness / 2,
+            field.clientHeight / 2.0,
+            barThickness, field.clientHeight,
+            {isStatic: true}
+        )
+        const ceiling = Bodies.rectangle(
+            field.clientWidth / 2.0,
+            barThickness / 2,
+            field.clientWidth, barThickness,
+            {isStatic: true}
+        )
+
+        // build balance
+        const upperBalanceBar = Bodies.rectangle(
+            field.clientWidth / 2.0,
+            field.clientHeight * 0.8,
+            balanceBarWidth, barThickness,
+            {isStatic: false}
+        )
+        const composedUpperBar = Constraint.create({
+            pointA: {x: field.clientWidth / 2.0, y: field.clientHeight * 0.8},
+            bodyB: upperBalanceBar,
+            stiffness: 1,
+            length: 0
+        })
+        const lowerBalanceBar = Bodies.rectangle(
+            field.clientWidth / 2.0,
+            field.clientHeight * 0.9,
+            balanceBarWidth, barThickness,
+            {isStatic: false}
+        )
+        const composedLowerBar = Constraint.create({
+            pointA: {x: field.clientWidth / 2.0, y: field.clientHeight * 0.9},
+            bodyB: lowerBalanceBar,
+            stiffness: 1,
+            length: 0
+        })
+        const leftCylinder = Bodies.rectangle(
+            field.clientWidth - balanceBarWidth + barThickness / 2,
+            field.clientHeight * 0.8,
+            barThickness, cylinderHeight,
+            {isStatic: false}
+        )
+        const rightCylinder = Bodies.rectangle(
+            field.clientWidth / 2 + balanceBarWidth / 2 - barThickness / 2,
+            field.clientHeight * 0.8,
+            barThickness, cylinderHeight,
+            {isStatic: false}
+        )
+        const leftPlate = Bodies.rectangle(
+            field.clientWidth - balanceBarWidth + barThickness / 2,
+            field.clientHeight * 0.8 - cylinderHeight / 2,
+            plateWidth, barThickness,
+            {isStatic: false}
+        )
+        const rightPlate = Bodies.rectangle(
+            field.clientWidth / 2 + balanceBarWidth / 2,
+            field.clientHeight * 0.8 - cylinderHeight / 2,
+            plateWidth, barThickness,
+            {isStatic: false}
+        )
+        const composedLeftPlate = Body.create({
+            parts: [leftPlate, leftCylinder],
+            inertia: Infinity,
+            frictionAir: 0.0000
+        })
+        const composedRightPlate = Body.create({
+            parts: [rightPlate, rightCylinder],
+            inertia: Infinity,
+            frictionAir: 0.0000
+        })
+        const composedLeftLowerStage = Constraint.create({
+            bodyB: lowerBalanceBar,
+            pointB: {x: - balanceBarWidth / 2, y: 0},//{x: field.clientWidth - field.clientWidth / 1.4, y: field.clientHeight * 0.9},
+            bodyA: composedLeftPlate,
+            pointA: {x: barThickness / 2, y: field.clientHeight * 0.1},
+            stiffness: 1,
+            length: 0
+        })
+        const composedLeftUpperStage = Constraint.create({
+            bodyB: upperBalanceBar,
+            pointB: {x: - balanceBarWidth / 2, y:0},
+            bodyA: composedLeftPlate,
+            pointA: {x: barThickness / 2, y: - field.clientHeight * 0},
+            stiffness: 1,
+            length: 0
+        })
+        const composedRightLowerStage = Constraint.create({
+            bodyB: lowerBalanceBar,
+            pointB: {x: balanceBarWidth / 2, y: 0},
+            bodyA: composedRightPlate,
+            pointA: {x: - barThickness / 2, y: field.clientHeight * 0.1},
+            stiffness: 1,
+            length: 0
+        })
+        const composedRightUpperStage = Constraint.create({
+            bodyB: upperBalanceBar,
+            pointB: {x: balanceBarWidth / 2, y: 0},
+            bodyA: composedRightPlate,
+            pointA: {x: - barThickness / 2, y: - field.clientHeight * 0.0},
+            stiffness: 1,
+            length: 0
+        })
+
+        // add all of the bodies to the world
+        Composite.add(engine.world, [
+            ground, leftWall, rightWall, ceiling,
+            upperBalanceBar, lowerBalanceBar,
+            rightCylinder, rightPlate,
+            composedLeftPlate,
+            composedRightPlate,
+            boxA, boxB, boxC]);
+        Composite.add(engine.world, [
+            composedUpperBar, composedLowerBar,
+            composedLeftUpperStage, composedLeftLowerStage,
+            composedRightUpperStage, composedRightLowerStage,
+        ])
+
+        // run the renderer
+        Render.run(render);
+
+        // create runner
+        const runner = Runner.create();
+
+        // run the engine
+        Runner.run(runner, engine);
+    </script>
+</body>
+</html>
