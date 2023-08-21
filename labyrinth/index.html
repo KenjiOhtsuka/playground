@@ -97,22 +97,24 @@
         const wn = Math.floor((width - barThickness) / 50) - 1
         const hn = Math.floor((height - barThickness) / 50) - 1
 
-        for (let i = 0; i < wn; i++) {
-            for (let j = 0; j < hn; j++) {
+        for (let i = 1; i < wn; i++) {
+            for (let j = 1; j < hn; j++) {
                 let bar;
                 const randVar = Math.random()
                 if (randVar < 0.3) {
+                    // vertical bar
                     bar = Bodies.rectangle(
                         (width - barThickness) / wn * i + barThickness / 2,
-                        (height - barThickness) / hn * j + barThickness / 2,
+                        (height - barThickness) / hn * j + barThickness / 2 - (height - barThickness) / hn / 2,
                         1,
                         (height - barThickness) / hn,
                         {isStatic: true, friction: friction}
                     )
                     bodies.push(bar)
                 } else if (randVar < 0.6) {
+                    // horizontal bar
                     bar = Bodies.rectangle(
-                        (width - barThickness) / wn * i + barThickness / 2,
+                        (width - barThickness) / wn * i + barThickness / 2 - (width - barThickness) / wn / 2,
                         (height - barThickness) / hn * j + barThickness / 2,
                         (width - barThickness) / wn,
                         1,
