@@ -28,6 +28,7 @@
 </head>
 <body>
     <script>
+        screen.orientation.lock('portrait')
         const field = document.body
 
         const balanceBarWidth = field.clientWidth / 1.4
@@ -64,19 +65,6 @@
                 height: field.clientHeight,
             }
         });
-
-        const mouse = Mouse.create(field);
-        const mouseConstraint = MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: {
-                render: {
-                    visible: false
-                }
-            }
-        })
-
-        Composite.add(engine.world, mouseConstraint)
-        render.mouse = mouse
 
         const bodies = []
 
